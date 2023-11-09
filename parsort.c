@@ -70,26 +70,26 @@ void merge_sort(int64_t *arr, size_t begin, size_t end, size_t threshold) {
 
   size_t mid = begin + size/2;
 
-  // TODO: parallelize the recursive sorting
+  // parallelize the recursive sorting
   pid_t leftFork = fork();
   if (leftFork == -1) {
     fatal("left fork failed to start new process");
   } else if (leftFork == 0) {
+    // in child process
     merge_sort(arr, begin, mid, threshold);
-    exit(0);
-  } else if (leftFork < 0) { //went to parent/caller
-    fatal("child not created");
+    exit(0); // kill child process
   }
+  // continue if in parent process...
 
   pid_t rightFork = fork();
   if (rightFork == -1) {
     fatal("right fork failed to start new process");
   } else if (rightFork == 0) {
+    // in child process
     merge_sort(arr, mid, end, threshold);
-    exit(0);
-  } else if (rightFork < 0) { //went to parent/caller
-    fatal("child not created");
+    exit(0); // kill child process
   }
+  // continue if in parent process...
 
   // pause program execution until a child process has completed
   int leftForkwStatus;
@@ -148,44 +148,46 @@ int main(int argc, char **argv) {
   char *end;
   size_t threshold = (size_t) strtoul(argv[2], &end, 10);
   if (end != argv[2] + strlen(argv[2])) {
-    // TODO: report an error (threshold value is invalid)
+    fatal("threshold value is invalid");
   }
 
-  // TODO: open the file
+  // open the file
   int fd = open(filename, O_RDWR);
   if (fd < 0) {
     fatal("file could not be opened");
   }
 
-  // TODO: use fstat to determine the size of the file
+  // use fstat to determine the size of the file
   struct stat statbuf;
   int rc = fstat(fd, &statbuf);
   if (rc != 0) {
     close(fd);
-    fatal("unable to unable to determine file size");
+    fatal("unable to determine file size");
   }
   size_t file_size_in_bytes = statbuf.st_size;
 
-  // TODO: map the file into memory using mmap
+  // map the file into memory using mmap
   int64_t *data = mmap(NULL, file_size_in_bytes, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
-  int closeResult = close(fd);
-  if (closeResult == -1) {
-    fatal("unable to close fd");
-  }
   if (data == MAP_FAILED) {
     fatal("unable to map file to memory");
   }
   
-  // TODO: sort the data!
+  // close the file
+  int closeResult = close(fd);
+  if (closeResult == -1) {
+    fatal("unable to close fd");
+  }
+  
+  // sort the data!
   size_t length = file_size_in_bytes / sizeof(int64_t);
   merge_sort(data, 0, length, threshold);
 
-  // TODO: unmap and close the file
+  // unmap the data
   int munmapResult = munmap(data, file_size_in_bytes);
   if (munmapResult == -1) {
     fatal("unable to unmap file from memory");
   }
 
-  // TODO: exit with a 0 exit code if sort was successful
+  // exit with a 0 exit code if sort was successful
   return 0;
 }
