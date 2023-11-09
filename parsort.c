@@ -112,7 +112,7 @@ void merge_sort(int64_t *arr, size_t begin, size_t end, size_t threshold) {
     fatal("right child failed");
   }
   if (WEXITSTATUS(rightForkwStatus) != 0) {
-    fatal("right child exit failed")
+    fatal("right child exit failed");
   }
 
   // allocate temp array now, so we can avoid unnecessary work
