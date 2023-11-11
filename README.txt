@@ -1,12 +1,31 @@
 CONTRIBUTIONS
 
-TODO: write a brief summary of how each team member contributed to
-the project.
+Liam did majority of the coding, while Trevor did majority of
+testing/reporting. Both contributed to all parts in some way,
+however.
 
 REPORT
 
-TODO: add your report according to the instructions in the
-"Experiments and analysis" section of the assignment description.
+The test results are below the explanation.
+
+In the results, we found that as the threshold decreased, so did
+the time it takes for the process to fully execute. This is because
+by decreasing the threshold, it increased the amount of forks in the
+code before resorting to sequential sort. For example, the first
+test with a threshold of 2097152 means that the data of size 16M
+would be run only among 8 processes as 16M divided by 2097152 is 8.
+Following this logic, each subsequent test doubles the number of
+parallel processes accounting for the drastic reduction in time.
+
+This effect, however, stops after around 64 processes. This is
+because the computer only has so many cpu cores to utilize. After
+using them all up, adding more instances cannot utilize any more
+processing power.
+
+
+**********************
+**** TEST RESULTS ****
+**********************
 
 test 16M 2097152
     real    0m0.387s
